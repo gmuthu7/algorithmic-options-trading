@@ -1,7 +1,3 @@
-from kite.kite_info_service import KiteInfoService
-from kite.kite_instance_service import KiteInstanceService
-from kite.kite_quote_service import KiteQuoteService
+from kite.kite_login_service import KiteLoginService
 
-kite_instance_service = KiteInstanceService()
-kite_info_service = KiteInfoService(kite_instance_service=kite_instance_service)
-kite_quote_service = KiteQuoteService(kite_info_service=kite_info_service, kite_instance_service=kite_instance_service)
+kite_login_service = KiteLoginService()

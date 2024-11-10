@@ -4,7 +4,7 @@ from datetime import datetime, date
 import pandas as pd
 from redis_om import NotFoundError
 
-from kite.kite_instance_service import KiteInstanceService
+from kite.kite_login_service import KiteInstanceService
 from kite.kite_model import KiteStockInfoModel, KiteOptionInfoModel, KiteInstrumentModel
 from setting import KITE_STOCK_OPTION_MAPPING, KITE_INFO_TTL
 

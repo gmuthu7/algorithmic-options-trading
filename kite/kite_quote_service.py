@@ -6,7 +6,7 @@ from typing import Dict, List
 from redis_om import NotFoundError
 
 from kite.kite_info_service import KiteInfoService
-from kite.kite_instance_service import KiteInstanceService
+from kite.kite_login_service import KiteInstanceService
 from kite.kite_model import KiteStockQuoteModel, KiteOptionQuoteModel
 from setting import KITE_TICKER_THREADED
 
