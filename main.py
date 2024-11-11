@@ -4,13 +4,15 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from kite.kite_controller import router as login_router
+from login.login_controller import router as login_router
+from context.context_controller import router as context_router
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.include_router(login_router)
-# Add CORS middleware
+app.include_router(context_router)
+
 # noinspection PyTypeChecker
 app.add_middleware(
     CORSMiddleware,
