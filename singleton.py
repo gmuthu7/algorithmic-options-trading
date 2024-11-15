@@ -3,9 +3,11 @@ from datetime import datetime, timedelta
 from info.info_service import InfoService
 from login.login_service import LoginService
 from setting import DAILY_TTL_HOUR
+from tab.tab_service import TabService
 
 login_service = LoginService()
 info_service = InfoService(login_service)
+tab_service = TabService()
 
 
 def set_expiry_of_model_to_daily(model):

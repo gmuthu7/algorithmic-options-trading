@@ -3,7 +3,8 @@ import logging
 from fastapi import APIRouter
 
 from setting import STOCK_OPTION_MAPPING
-from singleton import info_service
+from singleton import info_service, tab_service
+from tab.tab_model import TabModel, TabModelPydantic
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -18,9 +19,23 @@ def stocks():
     return stock_expiry_mapping
 
 
-@router.get("/contexts")
-def contexts():
-    pass
+@router.get("/tabs")
+def tabs():
+    return tab_service.get_tabs()
+
+
+@router.post("/tab")
+def add_tab(tab: TabModelPydantic):
+    tab = TabModel(**tab.dict())
+    tab_service.add_tab(tab)
+    return {"status": "success"}
+
+
+@router.delete("/tab/{tab_id}")
+def add_tab(tab_id: str):
+    tab_service.delete_tab(tab_id)
+    return {"status": "success"}
+
 # @router.post("/{stock}/expiries/{expiry}")
 # def set_stock_and_expiry(stock: str, expiry: str):
 #     quote_service.add_stock(stock)

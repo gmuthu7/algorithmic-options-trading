@@ -6,12 +6,17 @@ from singleton import login_service
 router = APIRouter(prefix="/kite")
 
 
+@router.get("/login/status")
+def login_status():
+    if login_service.is_logged_in():
+        return {"status": True}
+    else:
+        return {"status": False}
+
+
 @router.get("/profile")
 def profile():
-    if login_service.is_logged_in():
-        return login_service.get_kite_connect().profile()
-    else:
-        raise HTTPException(status_code=401, detail="Not logged in")
+    return login_service.get_kite_connect().profile()
 
 
 @router.get("/login")

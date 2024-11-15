@@ -14,7 +14,7 @@ class KiteTickModel(EmbeddedJsonModel):
     low: float
     close: float
 
-
+ 
 class KiteOptionQuoteModel(JsonModel):
     # pk = f"{stock}_{expiry}"
     stock: str
