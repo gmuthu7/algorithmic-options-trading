@@ -6,13 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from login.login_controller import router as login_router
 from tab.tab_controller import router as context_router
+from info.info_controller import router as info_router
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.include_router(login_router)
 app.include_router(context_router)
-
+app.include_router(info_router)
 # noinspection PyTypeChecker
 app.add_middleware(
     CORSMiddleware,

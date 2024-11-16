@@ -1,9 +1,11 @@
 import logging
 from datetime import datetime, date
+from typing import Dict
 
 import pandas as pd
 from redis_om import NotFoundError
 
+import helper
 import singleton
 from info.info_model import StockInfoModel, OptionInfoModel, InstrumentModel
 from login.login_service import LoginService
@@ -13,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class InfoService:
-    def __init__(self, login_service: LoginService):
+    def __init__(self, stock_option_mapping: Dict, login_service: LoginService):
         self.login_service = login_service
+        self.stock_option_mapping = stock_option_mapping
         self.login_service.register_observer(self._on_login_state_change)
 
     def get_stock_info(self, stock: str):
@@ -31,7 +34,7 @@ class InfoService:
         df["expiry"] = pd.to_datetime(df["expiry"]).dt.date
         stock_df = df[df["instrument_type"] == "EQ"]
         option_df = df[(df["instrument_type"] == "CE") | (df["instrument_type"] == "PE")]
-        for stock_trading_symbol, option_name in STOCK_OPTION_MAPPING.items():
+        for stock_trading_symbol, option_name in self.stock_option_mapping.items():
             s_df = stock_df[stock_df["tradingsymbol"] == stock_trading_symbol]
             o_df = option_df[option_df["name"] == option_name]
             stock_instrument_token = s_df["instrument_token"].values[0]
@@ -39,29 +42,31 @@ class InfoService:
             expiries = o_df["expiry"].unique()
             for expiry in expiries:
                 e_df = o_df[o_df["expiry"] == expiry]
-                token_instrument_map = {}
+                instruments = []
                 for _, row in e_df.iterrows():
                     strike = row["strike"]
                     trading_symbol = row["tradingsymbol"]
                     instrument_type = row["instrument_type"]
                     instrument_token = row["instrument_token"]
-                    token_instrument_map[instrument_token] = InstrumentModel(strike=strike,
-                                                                             trading_symbol=trading_symbol,
-                                                                             instrument_type=instrument_type)
+                    instrument_model = InstrumentModel(strike=strike,
+                                                       trading_symbol=trading_symbol,
+                                                       instrument_type=instrument_type,
+                                                       instrument_token=instrument_token)
+                    instruments.append(instrument_model)
 
                 option_model = OptionInfoModel(pk=self._get_stock_expiry_str(stock_trading_symbol, expiry),
                                                stock=stock_trading_symbol,
-                                               expiry=expiry, instruments=token_instrument_map,
+                                               expiry=expiry, instruments=instruments,
                                                timestamp=datetime.now())
                 option_model.save()
-                singleton.set_expiry_of_model_to_daily(option_model)
+                helper.set_expiry_of_model_to_daily(option_model)
             stock_model = StockInfoModel(pk=stock_trading_symbol, stock=stock_trading_symbol,
                                          instrument_token=stock_instrument_token,
                                          expiries=expiries,
                                          lot_size=lot_size,
                                          timestamp=datetime.now())
             stock_model.save()
-            singleton.set_expiry_of_model_to_daily(stock_model)
+            helper.set_expiry_of_model_to_daily(stock_model)
         logger.info("Synced Info Service's Model")
 
     def _get_stock_expiry_str(self, stock: str, expiry: date):

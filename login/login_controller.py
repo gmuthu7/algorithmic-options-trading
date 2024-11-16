@@ -3,7 +3,7 @@ from starlette.responses import RedirectResponse
 
 from singleton import login_service
 
-router = APIRouter(prefix="/kite")
+router = APIRouter()
 
 
 @router.get("/login/status")

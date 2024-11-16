@@ -9,13 +9,14 @@ class InstrumentModel(EmbeddedJsonModel):
     strike: int
     trading_symbol: str
     instrument_type: str
+    instrument_token: int
 
 
 class OptionInfoModel(JsonModel):
     # pk = f"{stock}_{expiry}"
     stock: str
     expiry: date
-    instruments: Dict[int, InstrumentModel]  # instrument_token: KiteInstrumentModel
+    instruments: list[InstrumentModel]
     timestamp: datetime
 
 

@@ -1,19 +1,8 @@
-from datetime import datetime, timedelta
-
 from info.info_service import InfoService
 from login.login_service import LoginService
-from setting import DAILY_TTL_HOUR
+from setting import STOCK_OPTION_MAPPING
 from tab.tab_service import TabService
 
 login_service = LoginService()
-info_service = InfoService(login_service)
+info_service = InfoService(STOCK_OPTION_MAPPING, login_service)
 tab_service = TabService()
-
-
-def set_expiry_of_model_to_daily(model):
-    now = datetime.now()
-    next = now.replace(hour=DAILY_TTL_HOUR, minute=0, second=0, microsecond=0)
-    if now >= next:
-        next += timedelta(days=1)
-    ttl = int((next - now).total_seconds())
-    model.expire(ttl)

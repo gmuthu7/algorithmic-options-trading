@@ -5,6 +5,7 @@ from typing import Callable
 from kiteconnect import KiteConnect, KiteTicker
 from redis_om import NotFoundError
 
+import helper
 import singleton
 from login.login_model import CredentialsModel
 from setting import KITE_LOGIN_URL, KITE_CREDENTIALS_KEY
@@ -27,7 +28,7 @@ class LoginService:
         cred.access_token = data["access_token"]
         cred.timestamp = datetime.now()
         cred.save()
-        singleton.set_expiry_of_model_to_daily(cred)  # TODO: Use kite's session_expiry_hook instead
+        helper.set_expiry_of_model_to_daily(cred)  # TODO: Use kite's session_expiry_hook instead
         self._update_instances()
 
     def get_login_uri(self):
