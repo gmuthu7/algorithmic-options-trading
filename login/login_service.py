@@ -18,7 +18,7 @@ class LoginService:
     def __init__(self):
         cred = self._get_credentials_from_redis()
         self._kite_connect = KiteConnect(cred.api_key, cred.access_token)
-        self._kws = KiteTicker(cred.api_key, cred.access_token)
+        self._kws = KiteTicker(cred.api_key, cred.access_token, reconnect=False)
         self._observers = []  # pub-sub
         # cred: KiteCredentialsModel in redis
 

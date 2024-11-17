@@ -9,8 +9,8 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/stocks")
-def stocks():
+@router.get("/tab/{tab_id}/stock/ws")
+def stocks(tab_id: str):
     stock_expiry_mapping = {}
     for stock in STOCK_OPTION_MAPPING:
         info = info_service.get_stock_info(stock)

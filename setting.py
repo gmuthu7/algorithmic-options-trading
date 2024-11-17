@@ -10,8 +10,9 @@ logging.basicConfig(level=logging.INFO,
 pd.set_option("display.max_column", None)
 KITE_LOGIN_URL = "https://kite.zerodha.com/connect/login?api_key=%s&v=3"
 KITE_CREDENTIALS_KEY = "kite_credentials"
+STOCK_STREAM_KEY = "ltp:stock"
 DAILY_TTL_HOUR = 6
-TICKER_THREADED = False
+TICKER_THREADED = True
 STOCK_OPTION_MAPPING = {
     "NIFTY 50": "NIFTY",
     "NIFTY FIN SERVICE": "FINNIFTY",

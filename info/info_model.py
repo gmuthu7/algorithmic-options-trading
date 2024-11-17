@@ -6,9 +6,7 @@ from redis_om import JsonModel, EmbeddedJsonModel
 
 # Info Models
 class InstrumentModel(EmbeddedJsonModel):
-    strike: int
     trading_symbol: str
-    instrument_type: str
     instrument_token: int
 
 
@@ -16,7 +14,8 @@ class OptionInfoModel(JsonModel):
     # pk = f"{stock}_{expiry}"
     stock: str
     expiry: date
-    instruments: list[InstrumentModel]
+    ce: Dict[int, InstrumentModel]  # strike: InstrumentModel
+    pe: Dict[int, InstrumentModel]  # strike: InstrumentModel
     timestamp: datetime
 
 

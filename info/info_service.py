@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from datetime import datetime, date
 from typing import Dict
 
@@ -6,10 +7,8 @@ import pandas as pd
 from redis_om import NotFoundError
 
 import helper
-import singleton
 from info.info_model import StockInfoModel, OptionInfoModel, InstrumentModel
 from login.login_service import LoginService
-from setting import STOCK_OPTION_MAPPING
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ class InfoService:
         return StockInfoModel.get(stock)
 
     def get_option_info(self, stock: str, expiry: date):
-        return OptionInfoModel.get(self._get_stock_expiry_str(stock, expiry))
+        return OptionInfoModel.get(helper.get_primary_key(stock, expiry))
 
     def _sync_model_with_kite(self):
         connect = self.login_service.get_kite_connect()
@@ -42,21 +41,23 @@ class InfoService:
             expiries = o_df["expiry"].unique()
             for expiry in expiries:
                 e_df = o_df[o_df["expiry"] == expiry]
-                instruments = []
+                ce: Dict[int, InstrumentModel] = defaultdict(None)
+                pe: Dict[int, InstrumentModel] = defaultdict(None)
                 for _, row in e_df.iterrows():
-                    strike = row["strike"]
+                    strike = int(row["strike"])
                     trading_symbol = row["tradingsymbol"]
                     instrument_type = row["instrument_type"]
                     instrument_token = row["instrument_token"]
-                    instrument_model = InstrumentModel(strike=strike,
-                                                       trading_symbol=trading_symbol,
-                                                       instrument_type=instrument_type,
+                    instrument_model = InstrumentModel(trading_symbol=trading_symbol,
                                                        instrument_token=instrument_token)
-                    instruments.append(instrument_model)
+                    if instrument_type.lower() == "ce":
+                        ce[strike] = instrument_model
+                    else:
+                        pe[strike] = instrument_model
 
-                option_model = OptionInfoModel(pk=self._get_stock_expiry_str(stock_trading_symbol, expiry),
+                option_model = OptionInfoModel(pk=helper.get_primary_key(stock_trading_symbol, expiry),
                                                stock=stock_trading_symbol,
-                                               expiry=expiry, instruments=instruments,
+                                               expiry=expiry, ce=ce, pe=pe,
                                                timestamp=datetime.now())
                 option_model.save()
                 helper.set_expiry_of_model_to_daily(option_model)
@@ -68,9 +69,6 @@ class InfoService:
             stock_model.save()
             helper.set_expiry_of_model_to_daily(stock_model)
         logger.info("Synced Info Service's Model")
-
-    def _get_stock_expiry_str(self, stock: str, expiry: date):
-        return f"{stock}_{expiry}"
 
     def _check_if_model_in_sync(self):
         try:

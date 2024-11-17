@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from starlette.responses import RedirectResponse
 
 from singleton import login_service
@@ -12,11 +12,6 @@ def login_status():
         return {"status": True}
     else:
         return {"status": False}
-
-
-@router.get("/profile")
-def profile():
-    return login_service.get_kite_connect().profile()
 
 
 @router.get("/login")
